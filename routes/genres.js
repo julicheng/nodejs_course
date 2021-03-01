@@ -1,18 +1,6 @@
-const mongoose = require('mongoose');
-const Joi = require('joi');
+const { Genre, validate } = require('../models/genre');
 const express = require('express');
 const router = express.Router();
-
-const genreSchema = new mongoose.Schema({
-  name: { type: String, required: true, minlength: 5, maxlength: 50 },
-});
-
-const Genre = mongoose.model('Genre', genreSchema);
-
-const validateGenre = (genre) => {
-  const schema = Joi.object({ name: Joi.string().min(3).required() });
-  return schema.validate(genre);
-};
 
 router.get('/', async (req, res) => {
   const genres = await Genre.find().sort('name');
@@ -20,14 +8,16 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const genre = await Genre.findById(req.params.id);
-  if (!genre) return res.status(404).send('genre was not found');
-
-  res.send(genre);
+  try {
+    const genre = await Genre.findById(req.params.id);
+    res.send(genre);
+  } catch {
+    return res.status(404).send('genre was not found');
+  }
 });
 
 router.post('/', async (req, res) => {
-  const { error } = validateGenre(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error);
 
   let genre = new Genre({
@@ -41,7 +31,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   // validate
   // if invalid return 400
-  const { error } = validateGenre(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error);
 
   // find and update
@@ -59,13 +49,12 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  //lookup the genre
-  const genre = await Genre.findByIdAndRemove(req.params.id);
-  //not existing then 404
-  if (!genre) return res.status(404).send('genre was not found');
-
-  //return the same genre
-  res.send(genre);
+  try {
+    const genre = await Genre.findByIdAndRemove(req.params.id);
+    res.send(genre);
+  } catch {
+    return res.status(404).send('genre was not found');
+  }
 });
 
 module.exports = router;
