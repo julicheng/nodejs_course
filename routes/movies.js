@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const movie = await Movie.find().sort('name');
-  res.send(movie);
+  const movies = await Movie.find().sort('name');
+  res.send(movies);
 });
 
 router.get('/:id', async (req, res) => {
@@ -16,14 +16,23 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// router.post('/', async (req, res) => {
-//   const { error } = validate(req.body);
-//   if (error) return res.status(400).send(error);
+router.post('/', async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error);
 
-//   let movie = new Movie({
-//     name: req.body.name,
-//   });
+  const genre = await Genre.findById(req.body.genreId);
+  if (!genre) return res.status(400).send('invalid genre');
 
-//   movie = await genre.save();
-//   res.send(genre);
-// });
+  let movie = new Movie({
+    title: req.body.name,
+    genre: {
+      _id: genre._id,
+      name: genre.name,
+    },
+    numberInStock: req.body.numberInStock,
+    dailyRentalRatee: req.body.dailyRentalRatee,
+  });
+
+  movie = await movie.save();
+  res.send(genre);
+});
