@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
-const Joi = require('joi');
 const { genreSchema } = require('./genre');
+const Joi = require('joi');
 
 const validateMovie = (movie) => {
   // validating what the client sends us
   const schema = Joi.object({
     title: Joi.string().min(5).max(255).required(),
-    genreId: Joi.string().required,
-    numberInStock: Joi.number(),
-    dailyRentalRate: Joi.number(),
+    genreId: Joi.string().required(),
+    numberInStock: Joi.number().min(0).max(50),
+    dailyRentalRate: Joi.number().min(0).max(50),
   });
   return schema.validate(movie);
 };
@@ -25,8 +25,8 @@ const Movie = mongoose.model(
       trim: true,
     },
     genre: { type: genreSchema, required: true },
-    numberInStock: { type: Number, default: 0 },
-    dailyRentalRate: { type: Number, default: 0 },
+    numberInStock: { type: Number, default: 0, min: 0, max: 255 },
+    dailyRentalRate: { type: Number, default: 0, min: 0, max: 255 },
   })
 );
 
