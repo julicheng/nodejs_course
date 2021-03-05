@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
-const { required } = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 
 const validateRental = (genre) => {
   const schema = Joi.object({
     // we send these from client side then we read whats in database on the server
     // and pop values
-    customerId: Joi.string().required(),
-    movieId: Joi.string().required(),
+    customerId: Joi.objectId().required(),
+    movieId: Joi.objectId().required(),
   });
   return schema.validate(genre);
 };

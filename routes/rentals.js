@@ -1,8 +1,12 @@
 const { Rental, validate } = require('../models/rental');
 const { Customer } = require('../models/customer');
 const { Movie } = require('../models/movie');
+const mongoose = require('mongoose');
+const Fawn = require('fawn');
 const express = require('express');
 const router = express.Router();
+
+Fawn.init(mongoose);
 
 router.get('/', async (req, res) => {
   const rentals = await Rental.find().sort('-dateOut');
@@ -43,13 +47,33 @@ router.post('/', async (req, res) => {
       },
     });
 
-    rental = await rental.save();
-    movie.numberInStock--;
-    movie.save();
+    // rental = await rental.save();
+    // movie.numberInStock--;
+    // movie.save();
+
+    // TRANSASCTION
+    new Fawn.Task()
+      // working directly with collection so pass in 'rentals'
+      .save('rentals', rental)
+      .update(
+        'movies',
+        { _id: movie._id },
+        {
+          $inc: { numberInStock: -1 },
+        }
+      )
+      .run();
+    // ojinttaskcollections collection is created for Fawn temp data
 
     res.send(rental);
-  } catch {
-    return res.status(400).send('customer or movie not found');
+  } catch (e) {
+    console.log(e);
+    return (
+      res
+        // 500 if server error
+        .status(400)
+        .send('customer or movie not found or somthing failed')
+    );
   }
 });
 
