@@ -33,6 +33,7 @@ router.post('/', async (req, res) => {
     config.get('jwtPrivateKey') // used to create digital signature
   );
   // should prefix custom header with x-
+  // send header with token when registered
   res
     .header('x-auth-token', token)
     .send(_.pick(user, ['_id', 'name', 'email']));
