@@ -1,3 +1,4 @@
+const error = require('./middleware/error');
 const config = require('config');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
@@ -26,6 +27,7 @@ mongoose
   .catch(() => console.error('Could not connect to MongoDB...'));
 
 // adding a piece of middleware
+// they run in order
 app.use(express.json()); // req.body is this
 app.use('/api/genres', genres);
 app.use('/api/customers', customers);
@@ -33,6 +35,8 @@ app.use('/api/movies', movies);
 app.use('/api/rentals', rentals);
 app.use('/api/users', users);
 app.use('/api/auth', auth);
+
+app.use(error);
 
 const port = process.env.PORT || 3000;
 app.listen(3000, () => console.log(`Listening on port ${port}....`));
