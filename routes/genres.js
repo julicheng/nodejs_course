@@ -1,28 +1,26 @@
+const asyncMiddleware = require('../middleware/async');
 const admin = require('../middleware/admin');
 const auth = require('../middleware/auth');
 const { Genre, validate } = require('../models/genre');
 const express = require('express');
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  try {
+router.get(
+  '/',
+  asyncMiddleware(async (req, res) => {
     const genres = await Genre.find().sort('name');
     res.send(genres);
-  } catch (e) {
-    // we should move this somewhere central
-    // res.status(500).send('Something failed');
-    next(ex);
-  }
-});
+  })
+);
 
-router.get('/:id', async (req, res) => {
-  try {
+router.get(
+  '/:id',
+  asyncMiddleware(async (req, res) => {
     const genre = await Genre.findById(req.params.id);
     res.send(genre);
-  } catch {
-    return res.status(404).send('genre was not found');
-  }
-});
+    // return res.status(404).send('genre was not found');
+  })
+);
 
 // second param is middleware function
 router.post('/', auth, async (req, res) => {
