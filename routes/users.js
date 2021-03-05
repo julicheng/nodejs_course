@@ -1,3 +1,5 @@
+const config = require('config');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const { User, validate } = require('../models/user');
@@ -22,7 +24,18 @@ router.post('/', async (req, res) => {
 
   // only pick id, name and email from the object and
   // dont return pw
-  res.send(_.pick(user, ['_id', 'name', 'email']));
+  // res.send(_.pick(user, ['_id', 'name', 'email']));
+
+  const token = jwt.sign(
+    {
+      _id: user._id, // this is the payload
+    },
+    config.get('jwtPrivateKey') // used to create digital signature
+  );
+  // should prefix custom header with x-
+  res
+    .header('x-auth-token', token)
+    .send(_.pick(user, ['_id', 'name', 'email']));
 });
 
 module.exports = router;
