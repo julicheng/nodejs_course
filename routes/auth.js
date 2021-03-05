@@ -1,3 +1,4 @@
+const config = require('config');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
@@ -16,11 +17,12 @@ router.post('/', async (req, res) => {
   const valid = await bcrypt.compare(req.body.password, user.password);
   if (!valid) return res.status(400).send('invalid email or password');
 
+  // how to generate a token
   const token = jwt.sign(
     {
       _id: user._id, // this is the payload
     },
-    'jwtPrivateKey' // used to create digital signature
+    config.get('jwtPrivateKey') // used to create digital signature
   );
 
   res.send(token);
