@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 1024,
   },
+  isAdmin: Boolean,
 });
 
 // if you want to create a function that is a part of an object
@@ -37,6 +38,7 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     {
       _id: this._id, // this is the payload
+      isAdmin: this.isAdmin,
     },
     config.get('jwtPrivateKey') // used to create digital signature
   );
