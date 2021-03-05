@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { genreSchema } = require('./genre');
 const Joi = require('joi');
-Joi.objectId = require('joi-objectid')(Joi);
 
 const validateMovie = (movie) => {
   // validating what the client sends us
