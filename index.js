@@ -18,14 +18,14 @@ const app = express();
 // handling uncaught exceptions so not things going wrong in express
 // e.g. during startup
 process.on('uncaughtException', (ex) => {
-  console.log('uncaught exception');
   winston.error(ex.message, ex);
+  process.exit(1);
 });
 
 // handling rejections (promises) so ones missing the catch block
 process.on('unhandledRejection', (ex) => {
-  console.log('unhandled rejection');
   winston.error(ex.message, ex);
+  process.exit(1);
 });
 
 const logger = winston.createLogger({
