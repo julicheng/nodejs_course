@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const winston = require('winston');
+const config = require('config');
 
 module.exports = () => {
   // connect to mongodb
   mongoose
-    .connect('mongodb://localhost/vidly', {
+    .connect(config.get('db'), {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
