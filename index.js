@@ -22,6 +22,12 @@ process.on('uncaughtException', (ex) => {
   winston.error(ex.message, ex);
 });
 
+// handling rejections (promises) so ones missing the catch block
+process.on('unhandledRejection', (ex) => {
+  console.log('unhandled rejection');
+  winston.error(ex.message, ex);
+});
+
 const logger = winston.createLogger({
   format: winston.format.json(),
   transports: [
@@ -38,7 +44,10 @@ winston.add(
   })
 );
 
-// throw new Error('Something failed during startup');
+// throw new Error('Something failed during startup'); // uncaught exception
+
+// const p = Promise.reject(new Error('something has failed'));
+// p.then(() => console.log('done')); // unhandled rejection
 
 if (!config.get('jwtPrivateKey')) {
   console.log('FATAL ERROR: jwtPrivateKey is not defined');
