@@ -15,6 +15,13 @@ const auth = require('./routes/auth');
 const express = require('express');
 const app = express();
 
+// handling uncaught exceptions so not things going wrong in express
+// e.g. during startup
+process.on('uncaughtException', (ex) => {
+  console.log('uncaught exception');
+  winston.error(ex.message, ex);
+});
+
 const logger = winston.createLogger({
   format: winston.format.json(),
   transports: [
@@ -25,8 +32,13 @@ const logger = winston.createLogger({
 
 winston.add(logger);
 winston.add(
-  new winston.transports.MongoDB({ db: 'mongodb://localhost/vidly' })
+  new winston.transports.MongoDB({
+    db: 'mongodb://localhost/vidly',
+    level: 'error', // only log messages that are of level error
+  })
 );
+
+// throw new Error('Something failed during startup');
 
 if (!config.get('jwtPrivateKey')) {
   console.log('FATAL ERROR: jwtPrivateKey is not defined');
