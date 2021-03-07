@@ -1,5 +1,7 @@
 const winston = require('winston');
 
+// errors return err, req, res and next
+// only works in context of express
 module.exports = (err, req, res, next) => {
   // Log the exception
   //   winston.log('error', err.message);
